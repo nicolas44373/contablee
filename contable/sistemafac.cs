@@ -15,16 +15,12 @@ namespace contable
     public partial class sistemafac : Form
     {
         private List<Producto> productos;
-        private int nextId;
 
         public sistemafac()
         {
             InitializeComponent();
             this.Load += sistemafac_Load;
-            LoadDataFromFile();
-
-            // Configurar las columnas del DataGridView manualmente
-            ConfigurarColumnasDataGridView();
+            ConfigurarColumnasDataGridView(); // Configurar las columnas antes de cargar los datos
         }
 
         private void LoadDataFromFile()
@@ -33,8 +29,6 @@ namespace contable
 
             if (File.Exists("datos.txt"))
             {
-                dataGridView1.DataSource = null; // Limpiar el DataSource actual
-
                 using (StreamReader reader = new StreamReader("datos.txt"))
                 {
                     string line;
@@ -70,27 +64,34 @@ namespace contable
 
         private void ConfigurarColumnasDataGridView()
         {
-            // Configurar las columnas manualmente si no lo has hecho ya en el diseñador
-            dataGridView1.AutoGenerateColumns = false;
+            dataGridView1.AutoGenerateColumns = false; // Deshabilitar la generación automática de columnas
 
+            // Limpiar columnas existentes para evitar duplicados
+            dataGridView1.Columns.Clear();
+
+            // Configurar las columnas manualmente si no lo has hecho ya en el diseñador
             DataGridViewTextBoxColumn colId = new DataGridViewTextBoxColumn();
             colId.DataPropertyName = "Id";
             colId.HeaderText = "ID";
+            colId.Name = "Id";
             dataGridView1.Columns.Add(colId);
 
             DataGridViewTextBoxColumn colNombre = new DataGridViewTextBoxColumn();
             colNombre.DataPropertyName = "Nombre";
             colNombre.HeaderText = "Producto";
+            colNombre.Name = "Nombre";
             dataGridView1.Columns.Add(colNombre);
 
             DataGridViewTextBoxColumn colStock = new DataGridViewTextBoxColumn();
             colStock.DataPropertyName = "Stock";
             colStock.HeaderText = "Stock Disponible";
+            colStock.Name = "Stock";
             dataGridView1.Columns.Add(colStock);
 
             DataGridViewTextBoxColumn colPrecio = new DataGridViewTextBoxColumn();
             colPrecio.DataPropertyName = "Precio";
             colPrecio.HeaderText = "Precio por Unidad";
+            colPrecio.Name = "Precio";
             dataGridView1.Columns.Add(colPrecio);
         }
 
@@ -187,7 +188,7 @@ namespace contable
             // Iterar sobre las filas seleccionadas en el DataGridView
             foreach (DataGridViewRow selectedRow in dataGridView1.SelectedRows)
             {
-                int productId = Convert.ToInt32(selectedRow.Cells["Id"].Value);
+                int productId = Convert.ToInt32(selectedRow.Cells["Id"].Value); // Usar "Id" en lugar de "ID"
 
                 // Buscar y agregar el producto seleccionado a la lista de productos a vender
                 Producto productoSeleccionado = productos.Find(p => p.Id == productId);
@@ -204,6 +205,7 @@ namespace contable
                 this.Hide();
                 venderForm.ShowDialog();
                 GuardarDatos(); // Guardar datos después de realizar las ventas
+                this.Show(); // Volver a mostrar el formulario después de cerrar VenderForm
             }
             else
             {
